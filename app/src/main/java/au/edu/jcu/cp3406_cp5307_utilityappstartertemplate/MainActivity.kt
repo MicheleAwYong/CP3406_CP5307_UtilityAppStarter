@@ -42,8 +42,6 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-
-
 @Preview(showBackground = true)
 @Composable
 fun UtilityAppPreview() {
@@ -55,6 +53,8 @@ fun UtilityAppPreview() {
 @Composable
 fun UtilityApp() {
     var selectedTab by remember { mutableStateOf("Utility") }
+    var dailyGoalMl by remember { mutableIntStateOf(2000) }
+    var intakeMl by remember { mutableIntStateOf(0) }
 
     Scaffold(
         bottomBar = {
