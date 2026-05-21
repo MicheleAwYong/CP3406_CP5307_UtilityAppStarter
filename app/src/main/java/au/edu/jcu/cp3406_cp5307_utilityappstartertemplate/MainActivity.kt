@@ -103,13 +103,11 @@ fun UtilityScreen() {
 }
 
 @Composable
-fun SettingsScreen() {
-    Column(
-        Modifier
-            .fillMaxSize()
-            .padding(24.dp), Arrangement.spacedBy(16.dp)
-    ) {
-        Text("Settings Screen", style = MaterialTheme.typography.headlineMedium)
-        Text("This is where you can add toggles or preferences.")
+fun SettingsScreen(
+    dailyGoalMl: Int,
+    onGoalChange: (Int) -> Unit
+) {
+    var goalInput by remember(dailyGoalMl) { mutableStateOf(dailyGoalMl.toString()) }
+    val isValid = goalInput.toIntOrNull()?.let { it > 0 } == true
     }
 }
