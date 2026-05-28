@@ -36,6 +36,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import au.edu.jcu.cp3406_cp5307_utilityappstartertemplate.ui.theme.CP3406_CP5603UtilityAppStarterTemplateTheme
+
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -67,7 +68,7 @@ fun UtilityApp() {
             NavigationBar {
                 NavigationBarItem(
                     icon = { Icon(Icons.Default.Home, contentDescription = "Utility") },
-                    label = { Text("Utility") },
+                    label = { Text("Tracker") },
                     selected = selectedTab == "Utility",
                     onClick = { selectedTab = "Utility" }
                 )
@@ -82,8 +83,16 @@ fun UtilityApp() {
     ) { innerPadding ->
         Box(modifier = Modifier.padding(innerPadding)) {
             when (selectedTab) {
-                "Utility" -> UtilityScreen()
-                "Settings" -> SettingsScreen()
+                "Utility" -> UtilityScreen(
+                    intakeMl = intakeMl,
+                    dailyGoalMl = dailyGoalMl,
+                    onAdd = { amount -> intakeMl = (intakeMl + amount).coerceAtMost(dailyGoalMl) },
+                    onReset = { intakeMl = 0 }
+                )
+                "Settings" -> SettingsScreen(
+                    dailyGoalMl = dailyGoalMl,
+                    onGoalChange = { newGoal -> dailyGoalMl = newGoal }
+                )
             }
         }
     }
@@ -148,7 +157,6 @@ fun UtilityScreen(
     }
 }
 
-
 @Composable
 fun SettingsScreen(
     dailyGoalMl: Int,
@@ -156,6 +164,33 @@ fun SettingsScreen(
 ) {
     var goalInput by remember(dailyGoalMl) { mutableStateOf(dailyGoalMl.toString()) }
     val isValid = goalInput.toIntOrNull()?.let { it > 0 } == true
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(24.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        Text("Settings", style = MaterialTheme.typography.headlineMedium)
+
+        OutlinedTextField(
+            value = goalInput,
+            onValueChange = { goalInput = it },
+            label = { Text("Daily Goal (ml)") },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            isError = !isValid,
+            supportingText = {
+                if (!isValid) Text("Enter a number greater than 0")
+            },
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Button(
+            onClick = { goalInput.toIntOrNull()?.let { onGoalChange(it) } },
+            enabled = isValid,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Save Goal")
+        }
     }
 }
-
