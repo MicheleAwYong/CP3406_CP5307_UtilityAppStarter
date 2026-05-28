@@ -90,8 +90,14 @@ fun UtilityApp() {
 }
 
 @Composable
-fun UtilityScreen() {
-    var counter by remember { mutableIntStateOf(0) }
+fun UtilityScreen(
+    intakeMl: Int,
+    dailyGoalMl: Int,
+    onAdd: (Int) -> Unit,
+    onReset: () -> Unit
+) {
+    val progress = if (dailyGoalMl > 0) intakeMl.toFloat() / dailyGoalMl else 0f
+    val goalReached = intakeMl >= dailyGoalMl
 
     Column(
         modifier = Modifier
@@ -99,11 +105,45 @@ fun UtilityScreen() {
             .padding(24.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Text("Utility Screen", style = MaterialTheme.typography.headlineMedium)
-        Text("Counter: $counter", style = MaterialTheme.typography.bodyLarge)
+        Text("Hydration Tracker", style = MaterialTheme.typography.headlineMedium)
 
-        Button(onClick = { counter++ }) {
-            Text("Increment")
+        Text(
+            text = "$intakeMl / $dailyGoalMl ml",
+            style = MaterialTheme.typography.displaySmall,
+            color = if (goalReached) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground
+        )
+
+        LinearProgressIndicator(
+            progress = { progress },
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        if (goalReached) {
+            Text(
+                "🎉 Daily goal reached!",
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.primary
+            )
+        } else {
+            Text(
+                "${dailyGoalMl - intakeMl} ml remaining",
+                style = MaterialTheme.typography.bodyLarge
+            )
+        }
+
+        Text("Add water:", style = MaterialTheme.typography.labelLarge)
+
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Button(onClick = { onAdd(150) }) { Text("+150 ml") }
+            Button(onClick = { onAdd(250) }) { Text("+250 ml") }
+            Button(onClick = { onAdd(500) }) { Text("+500 ml") }
+        }
+
+        OutlinedButton(
+            onClick = onReset,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Reset Today's Intake")
         }
     }
 }
@@ -117,3 +157,4 @@ fun SettingsScreen(
     val isValid = goalInput.toIntOrNull()?.let { it > 0 } == true
     }
 }
+
